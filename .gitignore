@@ -216,3 +216,12 @@ __marimo__/
 
 # Streamlit
 .streamlit/secrets.toml
+
+data/*
+!data/.gitkeep
+outputs/features.csv
+outputs/*.npy
+*.jpg
+*.png
+.ipynb_checkpoints/
+__pycache__/
