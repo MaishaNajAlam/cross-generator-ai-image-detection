@@ -8,7 +8,7 @@ from pathlib import Path
 
 # ── Google Drive paths ────────────────────────────────────────────────────────
 # These are the runtime paths when running inside Google Colab.
-DRIVE_ROOT   = Path("/content/drive/MyDrive/ML_Project")
+DRIVE_ROOT   = Path("/content/drive/MyDrive/ml_project")
 IMAGE_ROOT   = DRIVE_ROOT / "images"
 SPLITS_DIR   = DRIVE_ROOT / "processed" / "splits"
 FEATURE_ROOT = DRIVE_ROOT / "processed" / "features"
