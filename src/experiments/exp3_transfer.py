@@ -32,7 +32,7 @@ FAKE_GENERATORS = [g for g in GENERATORS if g != "Real"]
 def run_exp3(
     features_root: Optional[Union[str, Path]] = None,
     output_dir: Optional[Union[str, Path]] = None,
-    model_name: Union[str, List[str]] = "LogisticRegression",
+    model_name: Union[str, List[str]] = "all",
     feature_set: str = "combined"
 ) -> Dict[str, Any]:
     """

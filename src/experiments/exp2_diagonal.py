@@ -64,7 +64,7 @@ def plot_individual_diagonal(df_model: pd.DataFrame, model_name: str, save_path:
 def run_exp2(
     features_root: Optional[Union[str, Path]] = None,
     output_dir: Optional[Union[str, Path]] = None,
-    model_name: Union[str, List[str]] = "LogisticRegression",
+    model_name: Union[str, List[str]] = "all",
     feature_set: str = "combined"
 ) -> Dict[str, Any]:
     """
