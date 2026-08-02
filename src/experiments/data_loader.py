@@ -8,13 +8,27 @@ import numpy as np
 
 try:
     from src.config import FEATURE_ROOT, FEATURE_VERSION
-    DEFAULT_FEATURES_ROOT = FEATURE_ROOT / FEATURE_VERSION
+    CONFIG_FEATURES_ROOT = FEATURE_ROOT / FEATURE_VERSION
 except ImportError:
     try:
         from config import FEATURE_ROOT, FEATURE_VERSION
-        DEFAULT_FEATURES_ROOT = FEATURE_ROOT / FEATURE_VERSION
+        CONFIG_FEATURES_ROOT = FEATURE_ROOT / FEATURE_VERSION
     except ImportError:
-        DEFAULT_FEATURES_ROOT = Path("/content/drive/MyDrive/ml_project/processed/features/v1")
+        CONFIG_FEATURES_ROOT = Path("/content/drive/MyDrive/ml_project/processed/features/v1")
+
+CANDIDATE_PATHS = [
+    Path("/content/drive/MyDrive/ml_project_prev/ml_project/processed/features/v1"),
+    Path("/content/drive/MyDrive/ml_project/processed/features/v1"),
+    CONFIG_FEATURES_ROOT,
+    Path("data/processed/features/v1"),
+    Path("processed/features/v1"),
+]
+
+DEFAULT_FEATURES_ROOT = CONFIG_FEATURES_ROOT
+for cand in CANDIDATE_PATHS:
+    if cand.exists():
+        DEFAULT_FEATURES_ROOT = cand
+        break
 
 FEATURES_ROOT = DEFAULT_FEATURES_ROOT
 

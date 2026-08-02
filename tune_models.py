@@ -152,6 +152,8 @@ def tune_pipeline(X_train: np.ndarray, y_train: np.ndarray, model_type: str, see
 
 
 def main():
+    from src.experiments.data_loader import FEATURES_ROOT
+    print(f"Using features path: {FEATURES_ROOT}")
     print("Loading X_train & y_train dataset...")
     X_train, y_train, _ = load_subset("train", feature_set="combined")
     print(f"Loaded train data: X shape = {X_train.shape}, y shape = {y_train.shape}")
