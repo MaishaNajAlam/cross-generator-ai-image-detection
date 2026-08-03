@@ -14,7 +14,7 @@ except ImportError:
         from config import FEATURE_ROOT, FEATURE_VERSION
         DEFAULT_FEATURES_ROOT = FEATURE_ROOT / FEATURE_VERSION
     except ImportError:
-        DEFAULT_FEATURES_ROOT = Path("/content/drive/MyDrive/ml_project/processed/features/v1")
+        DEFAULT_FEATURES_ROOT = Path(" /content/drive/MyDrive/ml_project_prev/ml_project/processed/features/v1")
 
 FEATURES_ROOT = DEFAULT_FEATURES_ROOT
 
