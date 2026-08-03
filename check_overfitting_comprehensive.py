@@ -35,11 +35,11 @@ except ImportError:
 
 try:
     from src.experiments.data_loader import load_subset
-    from src.experiments.models import get_models
+    from src.experiments.models import get_baseline_models, get_final_models
     from src.experiments.metrics import evaluate_binary
 except ImportError:
     from experiments.data_loader import load_subset
-    from experiments.models import get_models
+    from experiments.models import get_baseline_models, get_final_models
     from experiments.metrics import evaluate_binary
 
 from sklearn.pipeline import Pipeline
@@ -50,7 +50,6 @@ from sklearn.feature_selection import SelectKBest, f_classif
 from sklearn.model_selection import learning_curve
 
 try:
-    # pyrefly: ignore [missing-import]
     from lightgbm import LGBMClassifier
     HAS_LGBM = True
 except ImportError:
@@ -58,38 +57,18 @@ except ImportError:
 
 
 def get_regularized_models(seed: int = 42):
-    """Returns baseline + regularized models for comparative diagnostic."""
-    models = {
-        "Logistic (Default C=1.0)": Pipeline([
-            ("scaler", StandardScaler()),
-            ("clf", LogisticRegression(C=1.0, max_iter=1000, random_state=seed))
-        ]),
-        "Logistic (L1 Reg C=0.01)": Pipeline([
-            ("scaler", StandardScaler()),
-            ("clf", LogisticRegression(penalty="l1", C=0.01, solver="saga", random_state=seed, max_iter=1000))
-        ]),
-        "RandomForest (Default Unconstrained)": Pipeline([
-            ("scaler", StandardScaler()),
-            ("clf", RandomForestClassifier(n_estimators=300, random_state=seed, n_jobs=-1))
-        ]),
-        "RandomForest (Regularized Depth=10)": Pipeline([
-            ("scaler", StandardScaler()),
-            ("clf", RandomForestClassifier(n_estimators=300, max_depth=10, min_samples_leaf=5, random_state=seed, n_jobs=-1))
-        ])
-    }
+    """Returns baseline + regularized/tuned final models for comparative diagnostic."""
+    baselines = get_baseline_models(seed=seed)
+    finals = get_final_models(seed=seed)
 
-    if HAS_LGBM:
-        models["LightGBM (Default)"] = Pipeline([
-            ("scaler", StandardScaler()),
-            ("clf", LGBMClassifier(n_estimators=500, learning_rate=0.05, num_leaves=63, random_state=seed, n_jobs=-1, verbose=-1))
-        ])
-        models["LightGBM (Top 300 + Subsample)"] = Pipeline([
-            ("scaler", StandardScaler()),
-            ("select_k", SelectKBest(score_func=f_classif, k=300)),
-            ("clf", LGBMClassifier(n_estimators=300, learning_rate=0.03, num_leaves=15, max_depth=6, colsample_bytree=0.3, subsample=0.8, random_state=seed, n_jobs=-1, verbose=-1))
-        ])
+    models = {}
+    for name in baselines:
+        models[f"{name} (Baseline Default)"] = baselines[name]
+        if name in finals:
+            models[f"{name} (Tuned Final)"] = finals[name]
 
     return models
+
 
 
 def run_comprehensive_diagnostic(features_root: Path = DEFAULT_FEATURES_ROOT, save_plots: bool = True):
