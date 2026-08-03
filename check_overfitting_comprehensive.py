@@ -31,7 +31,7 @@ except ImportError:
         from config import FEATURE_ROOT, FEATURE_VERSION
         DEFAULT_FEATURES_ROOT = FEATURE_ROOT / FEATURE_VERSION
     except ImportError:
-        DEFAULT_FEATURES_ROOT = Path("/content/drive/MyDrive/ml_project/processed/features/v1")
+        DEFAULT_FEATURES_ROOT = Path("/content/drive/MyDrive/ml_project_prev/ml_project/processed/features/v1")
 
 try:
     from src.experiments.data_loader import load_subset
@@ -50,6 +50,7 @@ from sklearn.feature_selection import SelectKBest, f_classif
 from sklearn.model_selection import learning_curve
 
 try:
+    # pyrefly: ignore [missing-import]
     from lightgbm import LGBMClassifier
     HAS_LGBM = True
 except ImportError:
