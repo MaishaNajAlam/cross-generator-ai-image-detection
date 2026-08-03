@@ -1,0 +1,42 @@
+{
+  "random_seed": 42,
+  "feature_to_sample_ratio": 2.481,
+  "n_train_samples": 3360,
+  "n_features": 8336,
+  "parsimony_threshold": 0.002,
+  "LogisticRegression": {
+    "note": "Fixed \u2014 L1 regularization proven optimal (Train-Val gap +0.0009)",
+    "penalty": "l1",
+    "C": 0.01,
+    "solver": "saga",
+    "max_iter": 1000
+  },
+  "SVM_RBF": {
+    "note": "Fixed \u2014 Already exhibits excellent generalization (gap +0.0426)",
+    "C": 1.0,
+    "kernel": "rbf",
+    "gamma": "scale"
+  },
+  "RandomForest": {
+    "k": 100,
+    "selector": "f_classif",
+    "cv_f1": 0.9135,
+    "n_estimators": 300,
+    "max_depth": 8,
+    "min_samples_leaf": 4,
+    "max_features": "sqrt"
+  },
+  "LightGBM": {
+    "k": 100,
+    "selector": "f_classif",
+    "cv_f1": 0.92801,
+    "n_estimators": 300,
+    "learning_rate": 0.03,
+    "num_leaves": 15,
+    "max_depth": 6,
+    "colsample_bytree": 0.5,
+    "subsample": 0.8,
+    "min_child_samples": 20
+  },
+  "tuning_time_seconds": 1910.0
+}
