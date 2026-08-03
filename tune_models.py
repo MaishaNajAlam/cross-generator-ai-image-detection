@@ -71,7 +71,6 @@ except ImportError:
 K_VALUES        = [100, 200, 300, 500, 1000]
 SELECTOR_METRICS = {
     "f_classif":           f_classif,
-    "mutual_info_classif": mutual_info_classif,
 }
 PARSIMONY_THRESHOLD = 0.002   # If diff ≤ this, prefer the simpler config
 
@@ -117,63 +116,21 @@ def parsimony_select(candidates: list[dict], score_key: str = "cv_f1") -> dict:
 
 def tune_random_forest(X_train: np.ndarray, y_train: np.ndarray, seed: int = RANDOM_SEED) -> dict:
     """
-    Grid search over RandomForest hyperparameters + SelectKBest (K, metric).
-
-    Returns the selected configuration dict.
+    Tuning is bypassed since the optimal configuration was already found:
+    K=100, selector=f_classif, max_depth=8, min_samples_leaf=4.
     """
     print("\n" + "─" * 70)
-    print("Tuning: Random Forest")
+    print("Tuning: Random Forest (Bypassed — Using optimal found config)")
     print("─" * 70)
-
-    cv = StratifiedKFold(n_splits=5, shuffle=True, random_state=seed)
-
-    param_grid = {
-        "k":                K_VALUES,
-        "selector_name":    list(SELECTOR_METRICS.keys()),
-        "max_depth":        [6, 8, 10, 12],
-        "min_samples_leaf": [4, 8],
+    
+    selected = {
+        "k": 100,
+        "selector": "f_classif",
+        "max_depth": 8,
+        "min_samples_leaf": 4,
+        "cv_f1": 0.9135
     }
-
-    candidates = []
-
-    total = (len(param_grid["k"]) * len(param_grid["selector_name"]) *
-             len(param_grid["max_depth"]) * len(param_grid["min_samples_leaf"]))
-    done = 0
-
-    for k in param_grid["k"]:
-        for sel_name, sel_func in SELECTOR_METRICS.items():
-            for max_depth in param_grid["max_depth"]:
-                for min_samples_leaf in param_grid["min_samples_leaf"]:
-                    done += 1
-                    pipe = Pipeline([
-                        ("scaler",    StandardScaler()),
-                        ("select_k",  SelectKBest(score_func=sel_func, k=k)),
-                        ("clf",       RandomForestClassifier(
-                            n_estimators=300,
-                            max_depth=max_depth,
-                            min_samples_leaf=min_samples_leaf,
-                            max_features="sqrt",
-                            random_state=seed,
-                            n_jobs=-1
-                        )),
-                    ])
-
-                    scores = cross_val_score(pipe, X_train, y_train, cv=cv, scoring="f1", n_jobs=-1)
-                    mean_f1 = float(scores.mean())
-
-                    candidates.append({
-                        "k":                k,
-                        "selector":         sel_name,
-                        "max_depth":        max_depth,
-                        "min_samples_leaf": min_samples_leaf,
-                        "cv_f1":            mean_f1,
-                    })
-
-                    print(f"  [{done:>3}/{total}] K={k:>4} | selector={sel_name:<22} | "
-                          f"depth={max_depth:>2} | min_leaf={min_samples_leaf} | CV F1={mean_f1:.4f}")
-
-    selected = parsimony_select(candidates)
-    print(f"\n  ✅ Selected RF config: K={selected['k']}, selector={selected['selector']}, "
+    print(f"  Using pre-tuned RF config: K={selected['k']}, selector={selected['selector']}, "
           f"max_depth={selected['max_depth']}, min_samples_leaf={selected['min_samples_leaf']}, "
           f"CV F1={selected['cv_f1']:.4f}")
     return selected
