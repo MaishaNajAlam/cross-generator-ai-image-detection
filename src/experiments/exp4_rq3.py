@@ -906,7 +906,7 @@ def validate_family_importance_via_ablation(
                     continue
 
                 y_pred = lgbm_pipeline.predict(X_te)
-                f1     = float(f1_score(y_te, y_pred, zero_division=0))
+                f1     = float(f1_score(y_te, y_pred, average="macro", zero_division=0))
                 cross_f1_list.append(f1)
                 logger.info(
                     "    Test on %-12s  F1 = %.4f",
