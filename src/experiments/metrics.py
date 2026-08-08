@@ -47,9 +47,9 @@ def evaluate_binary(
     """
     result = {
         "accuracy": float(accuracy_score(y_true, y_pred)),
-        "precision": float(precision_score(y_true, y_pred, average="macro", zero_division=0)),
-        "recall": float(recall_score(y_true, y_pred, average="macro", zero_division=0)),
-        "f1": float(f1_score(y_true, y_pred, average="macro", zero_division=0)),
+        "precision": float(precision_score(y_true, y_pred, zero_division=0)),
+        "recall": float(recall_score(y_true, y_pred, zero_division=0)),
+        "f1": float(f1_score(y_true, y_pred, zero_division=0)),
     }
     if y_prob is not None:
         try:
