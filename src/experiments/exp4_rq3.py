@@ -819,17 +819,42 @@ def validate_family_importance_via_ablation(
     logger.info("Evaluation : off-diagonal cross-generator F1 (train_gen != test_gen)")
     logger.info("Families   : %s", FAMILIES)
 
-    lgbm_pipeline = Pipeline([
-        ("scaler", StandardScaler()),
-        ("clf", LGBMClassifier(
-            n_estimators=500,
-            learning_rate=0.05,
-            num_leaves=63,
-            random_state=random_seed,
-            n_jobs=-1,
-            verbose=-1,
-        )),
-    ])
+    from sklearn.feature_selection import SelectKBest, f_classif
+
+    lgbm_pipeline = None
+    try:
+        try:
+            from src.experiments.models import get_final_models
+        except ImportError:
+            from .models import get_final_models
+        
+        if get_final_models is not None:
+            models_dict = get_final_models(seed=random_seed)
+            if "LightGBM" in models_dict:
+                lgbm_pipeline = models_dict["LightGBM"]
+                logger.info("Loaded tuned LightGBM pipeline for ablation.")
+    except Exception as e:
+        logger.warning("Could not load tuned LightGBM model: %s. Using default baseline.", e)
+
+    if lgbm_pipeline is None:
+        lgbm_pipeline = Pipeline([
+            ("scaler", StandardScaler()),
+            ("clf", LGBMClassifier(
+                n_estimators=500,
+                learning_rate=0.05,
+                num_leaves=63,
+                random_state=random_seed,
+                n_jobs=-1,
+                verbose=-1,
+            )),
+        ])
+        logger.info("Initialized default baseline LightGBM pipeline.")
+
+    # Record the original 'k' parameter of SelectKBest (if present) so we can dynamically cap it per family
+    tuned_k = None
+    if "select_k" in lgbm_pipeline.named_steps:
+        tuned_k = lgbm_pipeline.named_steps["select_k"].k
+        logger.info("Tuned select_k features: k = %s", tuned_k)
 
     ablation_rows = []
 
@@ -852,6 +877,9 @@ def validate_family_importance_via_ablation(
                     family, train_gen
                 )
                 continue
+
+            if tuned_k is not None and "select_k" in lgbm_pipeline.named_steps:
+                lgbm_pipeline.named_steps["select_k"].k = min(tuned_k, X_tr.shape[1])
 
             lgbm_pipeline.fit(X_tr, y_tr)
             logger.info(
